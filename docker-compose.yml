@@ -1,0 +1,67 @@
+services:
+  residence-service:
+    build: ./residence-service
+    environment:
+      PORT: 8001
+      DATABASE_PATH: /data/residence.db
+    ports:
+      - "${RESIDENCE_PORT:-8001}:8001"
+    volumes:
+      - residence-data:/data
+
+  employment-service:
+    build: ./employment-service
+    environment:
+      PORT: 8002
+      DATABASE_PATH: /data/employment.db
+    ports:
+      - "${EMPLOYMENT_PORT:-8002}:8002"
+    volumes:
+      - employment-data:/data
+
+  housing-service:
+    build: ./housing-service
+    environment:
+      PORT: 8003
+      DATABASE_PATH: /data/housing.db
+    ports:
+      - "${HOUSING_PORT:-8003}:8003"
+    volumes:
+      - housing-data:/data
+
+  service-matching-service:
+    build: ./service-matching-service
+    environment:
+      PORT: 8004
+    ports:
+      - "${MATCHING_PORT:-8004}:8004"
+
+  api-gateway:
+    build: ./api-gateway
+    environment:
+      PORT: 8000
+      RESIDENCE_SERVICE_URL: http://residence-service:8001
+      EMPLOYMENT_SERVICE_URL: http://employment-service:8002
+      HOUSING_SERVICE_URL: http://housing-service:8003
+      MATCHING_SERVICE_URL: http://service-matching-service:8004
+      DOWNSTREAM_TIMEOUT_SECONDS: 5
+    ports:
+      - "${GATEWAY_PORT:-8000}:8000"
+    depends_on:
+      - residence-service
+      - employment-service
+      - housing-service
+      - service-matching-service
+
+  portal:
+    build: ./citystart-portal
+    ports:
+      - "${PORTAL_PORT:-3000}:3000"
+    depends_on:
+      - api-gateway
+
+volumes:
+  residence-data:
+  employment-data:
+  housing-data:
+

@@ -1,0 +1,1171 @@
+下面这版可以直接发群。成员A—F替换成真实姓名即可。
+
+CityStart 小组项目最终任务分配
+1. 项目基本信息
+项目名称：
+CityStart：新市民安居与就业一站式服务平台
+英文名称：
+CityStart: A One-Stop Settlement and Employment Service Platform for New Urban Residents
+项目背景：
+以武汉市真实公共服务流程和官方办事资料为参考，设计一个统一平台，帮助新市民完成居住、就业和住房相关事项。系统为课程原型，不连接真实政府数据库，不使用真实个人敏感信息。
+服务提供者与服务范围
+服务提供者	服务
+公安政务部门	S1 居住登记；S2 居住证申请
+人力资源和社会保障部门	S3 就业登记；S4 就业扶持资格申请
+住房保障部门	S5 公租房资格申请；S6 住房租赁补贴申请
+三个重点业务流程
+	•	P1：居住证申请与补充材料流程
+	•	P2：住房租赁补贴申请与资格核验流程
+	•	P3：就业登记与就业扶持申请流程
+系统模块
+citystart-portal
+api-gateway
+residence-service
+employment-service
+housing-service
+service-matching-service
+项目最终需要覆盖服务识别与BSRL、三层ArchiMate、至少3个真实BPMN流程及语义效果、SoaML、至少3个微服务，以及至少2个流程的事件日志与流程挖掘。每周还需要真实会议记录和成员实际成果证据。
+
+2. 总体分工原则
+预计内部工作量：
+成员	预计工作量
+A 组长	17.6%
+B	17.0%
+C	16.4%
+D	16.4%
+E	16.3%
+F	16.3%
+合计	100%
+每个人都需要同时具备以下四类贡献：
+	1.	建模或课程分析成果
+	2.	代码、数据或技术成果
+	3.	报告写作成果
+	4.	测试、复核或整合成果
+“主负责人”负责组织、完成初稿和保证质量，不代表其他成员完全不参与。每部分完成后，全组需要共同检查，再进入下一阶段。
+
+A：项目组长、总体架构与服务匹配负责人
+角色名称
+Project Leader / Solution Architect / Service Matching Developer / Final Report Coordinator
+A的主要职责
+A1. 项目总体规划
+负责确定：
+	•	CityStart的项目边界；
+	•	平台解决的核心问题；
+	•	三个服务提供者之间的关系；
+	•	六项服务的统一名称；
+	•	Portal、Gateway和业务微服务的总体关系；
+	•	不做哪些超出范围的功能；
+	•	每周任务、截止日期和阶段目标。
+主要输出：
+	•	项目范围说明；
+	•	总体系统架构图；
+	•	组件职责表；
+	•	统一术语表；
+	•	WBS和时间安排。
+A2. 总体系统架构
+建议总体结构：
+Citizen
+   ↓
+CityStart Web Portal
+   ↓
+API Gateway
+   ├── Residence Service
+   ├── Employment Service
+   ├── Housing Service
+   └── Service Matching Service
+需要说明：
+	•	每个组件的职责；
+	•	为什么使用微服务划分；
+	•	服务之间如何通信；
+	•	哪些服务由政府部门提供；
+	•	CityStart如何形成统一的服务体验；
+	•	BPMN、SoaML、ArchiMate和代码之间如何对应。
+A3. Service Matching Service开发
+负责开发规则型服务匹配模块，根据用户状态生成推荐服务和办理顺序。
+建议接口：
+POST /recommendations
+输入信息可包括：
+citizen_id
+residence_registered
+residence_permit_approved
+employment_registered
+currently_renting
+owns_local_property
+available_documents
+输出可包括：
+completed_services
+recommended_services
+recommended_order
+missing_requirements
+eligibility_result
+recommendation_reason
+建议规则：
+	•	未完成居住登记：优先推荐居住登记；
+	•	已登记但没有居住证：推荐居住证申请；
+	•	未完成就业登记：推荐就业登记；
+	•	已就业、正在租房且没有本地住房：推荐住房补贴资格核验；
+	•	拥有本地住房：不推荐租赁补贴；
+	•	材料不足：返回缺少的材料；
+	•	主要条件满足：返回可提交的服务。
+技术交付：
+	•	FastAPI服务；
+	•	Pydantic输入输出模型；
+	•	规则判断代码；
+	•	基础错误处理；
+	•	Swagger测试；
+	•	至少5个不同用户状态的测试案例。
+A4. 跨模型一致性检查
+负责建立并维护：
+Cross-model Consistency Matrix
+业务概念	BSRL	ArchiMate	BPMN	SoaML	API/代码	日志
+居住证申请	S2	Business Service	P1	Residence Interface	Residence API	Submit Application
+就业登记	S3	Business Service	P3	Employment Contract	Employment API	Register Employment
+住房补贴	S6	Business Service	P2	Housing Contract	Housing API	Approve Subsidy
+检查重点：
+	•	同一服务不能出现多个不同英文名称；
+	•	BPMN任务需要能对应业务服务；
+	•	SoaML操作需要能对应真实API；
+	•	日志活动名称需要对应BPMN任务；
+	•	ArchiMate应用组件需要对应实际系统模块。
+A5. 项目管理
+负责：
+	•	组织每周至少一次正式会议；
+	•	提前发布会议议程；
+	•	追踪每个人本周成果；
+	•	管理共享文件夹和总版本；
+	•	维护问题清单和任务状态；
+	•	组织进度汇报；
+	•	组织最终联调；
+	•	建立提交前Checklist。
+A6. 报告写作
+A主写：
+	•	Executive Summary；
+	•	Introduction；
+	•	Background；
+	•	Problem Statement；
+	•	Objectives；
+	•	Scope；
+	•	Overall System Architecture；
+	•	Design Rationale；
+	•	Cross-model Consistency；
+	•	Overall Integration；
+	•	Project Management；
+	•	Limitations and Future Work；
+	•	Conclusion。
+A7. 最终报告汇总检查
+负责：
+	•	收集B—F完成的章节；
+	•	按最终目录合并；
+	•	统一章节结构；
+	•	删除重复内容；
+	•	补充章节衔接；
+	•	统一中英文术语；
+	•	统一流程、服务和图表编号；
+	•	检查图是否清晰；
+	•	检查引用和附录；
+	•	检查报告描述与代码、模型是否一致；
+	•	将问题退回原负责人修改；
+	•	完成最终版本质量检查。
+A8. 复核内容
+	•	复核E的Gateway与Service Composition；
+	•	最终检查所有模型和系统模块；
+	•	检查最终报告是否覆盖所有评分项。
+A9. 最终交付物
+Overall Architecture
+Project Scope
+Terminology Table
+Service Matching Service
+Matching Rules Table
+Matching API Tests
+Cross-model Consistency Matrix
+WBS and Progress Records
+Assigned Report Sections
+Final Integrated Report
+A10. 检索与学习关键词
+service-oriented architecture
+service decomposition
+high cohesion low coupling
+overall system architecture
+rule-based recommendation
+eligibility decision rules
+explainable service recommendation
+FastAPI POST endpoint
+Pydantic request response model
+cross-model consistency
+traceability matrix
+system acceptance testing
+project scope
+design rationale
+
+B：服务识别、BSRL、居住服务与项目文档负责人
+角色名称
+Service Identification and Documentation Lead / Residence Service Developer
+B的主要职责
+B1. 服务识别与Service Catalogue
+组织全组确认：
+	•	三个服务提供者；
+	•	六项服务；
+	•	服务消费者；
+	•	输入与输出；
+	•	前置条件；
+	•	服务效果；
+	•	QoS；
+	•	服务之间的依赖。
+Service Catalogue建议字段：
+Service ID
+Service Name
+Provider
+Consumer
+Functionality
+Inputs
+Outputs
+Preconditions
+Effects
+QoS
+Official Source
+B2. BSRL规格整合
+负责制定统一BSRL模板，并整合六项服务。
+B重点完成：
+	•	S1 Residence Registration Service；
+	•	S2 Residence Permit Application Service。
+C提供S3、S4的业务信息，D提供S5、S6的业务信息，B负责最终格式统一。
+服务说明应包含服务功能、调用和输出信息以及QoS等内容，与课程Service Modelling内容一致。
+B3. P1居住证申请BPMN
+负责：
+P1：居住证申请与补充材料流程
+建议参与者：
+	•	Citizen；
+	•	CityStart Platform；
+	•	Public Security Department。
+建议任务：
+Submit Application
+Validate Identity
+Check Documents
+Determine Document Completeness
+Request Additional Documents
+Submit Additional Documents
+Review Application
+Approve or Reject Application
+Notify Applicant
+需要使用适当的：
+	•	Pool和Lane；
+	•	User Task；
+	•	Service Task；
+	•	XOR Gateway；
+	•	Message Flow；
+	•	Data Object；
+	•	Timer Event；
+	•	补充材料循环。
+必须寻找真实官方资料，并制作：
+Official Source–BPMN Mapping Table
+官方文字步骤	BPMN编号	BPMN任务
+申请人提交申请材料	P1-T1	Submit Application
+部门检查材料	P1-T3	Check Documents
+材料不全时补交	P1-G1/P1-T5	Request Additional Documents
+B4. P1语义效果
+负责P1的：
+	•	Immediate Effects英文；
+	•	Immediate Effects一阶逻辑；
+	•	关键位置Cumulative Effect Scenarios；
+	•	BPMN图上效果标注；
+	•	单独语义效果说明页。
+C提供统一格式，E负责复核，B根据反馈修改。
+B5. Residence Service开发
+建议接口：
+POST /residence-registrations
+GET /residence-registrations/{citizen_id}
+
+POST /residence-permit-applications
+GET /residence-permit-applications/{application_id}
+
+POST /residence-permit-applications/{application_id}/documents
+PATCH /residence-permit-applications/{application_id}/status
+建议功能：
+	•	创建居住登记；
+	•	查询居住登记；
+	•	创建居住证申请；
+	•	补充材料；
+	•	查询状态；
+	•	更新审核状态。
+建议字段：
+citizen_id
+registration_id
+application_id
+residential_address
+residence_start_date
+documents
+status
+submitted_at
+updated_at
+技术交付：
+	•	FastAPI代码；
+	•	SQLite数据库；
+	•	Pydantic模型；
+	•	Swagger接口；
+	•	至少4个API测试案例。
+B6. P1事件日志模拟
+生成不同案例：
+	•	直接审核通过；
+	•	补件一次后通过；
+	•	多次补件；
+	•	材料不完整被拒；
+	•	资格不符被拒；
+	•	审核超时。
+日志格式遵守全组统一规范，并交给F进行流程挖掘。
+B7. 全项目文档整理
+负责：
+	•	API接口文档汇总；
+	•	README初稿；
+	•	项目运行步骤；
+	•	官方资料来源总表；
+	•	参考文献与访问日期；
+	•	附录资料索引；
+	•	每周实际成果文件索引。
+B8. 报告写作
+B主写：
+	•	Service Identification；
+	•	Service Catalogue；
+	•	BSRL Method；
+	•	Six Service Specifications；
+	•	P1 Source Mapping；
+	•	P1 BPMN Description；
+	•	Residence Service Implementation；
+	•	API Documentation；
+	•	README；
+	•	References初步整理。
+B9. 复核内容
+	•	复核D的P2住房流程；
+	•	检查六项BSRL格式；
+	•	检查各项官方资料是否支持相应流程；
+	•	检查API文档与实际接口是否一致。
+B10. 最终交付物
+Service Catalogue
+Six BSRL Specifications
+P1 BPMN
+P1 Official Source Mapping
+P1 Semantic Effects
+Residence Service
+P1 Event Log Simulator
+API Documentation
+README
+Official Sources and References Table
+B11. 检索与学习关键词
+Business Service Representation Language
+BSRL service specification
+service provider service consumer
+Input Output Precondition Effect
+IOPE service description
+Quality of Service QoS
+service catalogue
+
+武汉 居住登记 办事指南
+武汉 居住证 申请条件
+武汉 居住证 申请材料
+武汉 居住证 办理流程
+武汉 居住证 补充材料
+
+BPMN document verification
+BPMN application approval
+BPMN XOR gateway
+BPMN message flow
+BPMN timer event
+
+FastAPI CRUD SQLite
+Pydantic validation
+application status workflow
+Python event log simulator
+
+C：业务流程规范、语义效果与就业服务负责人
+角色名称
+Business Process and Semantic Effect Lead / Employment Service Developer
+C的主要职责
+C1. BPMN统一规范
+制定全组BPMN Modeling Convention，包括：
+	•	Pool和Lane划分规则；
+	•	Sequence Flow与Message Flow区别；
+	•	Task命名规则；
+	•	Gateway出口条件；
+	•	Start和End Event规则；
+	•	Data Object使用；
+	•	流程编号；
+	•	Immediate Effect标注位置；
+	•	Cumulative Effect编号；
+	•	三张图的字体与布局。
+编号示例：
+P1-T1 Submit Residence Permit Application
+P2-T4 Verify Employment Information
+P3-G1 Eligible for Support?
+C2. P3就业登记与扶持BPMN
+负责：
+P3：就业登记与就业扶持申请流程
+建议参与者：
+	•	Citizen；
+	•	CityStart Platform；
+	•	Human Resources and Social Security Department。
+建议任务：
+Submit Employment Information
+Validate Identity
+Verify Employment Evidence
+Register Employment Status
+Analyse Available Support
+Assess Support Eligibility
+Submit Support Application
+Review Application
+Approve or Reject
+Notify Applicant
+需要查找真实流程来源并建立来源映射表。
+C3. 语义效果统一方法
+负责确定：
+	•	谓词命名规则；
+	•	对象与变量格式；
+	•	正面和负面效果；
+	•	分支效果；
+	•	累计效果场景；
+	•	效果编号；
+	•	图上标注格式；
+	•	单独说明页格式。
+分工：
+	•	B完成P1效果；
+	•	D完成P2效果；
+	•	C完成P3效果；
+	•	C统一三套表达方式；
+	•	E复核服务语义；
+	•	A最终检查一致性。
+作业要求效果同时使用英文和一阶逻辑，并包含即时效果和累计效果场景。
+C4. Employment Service开发
+建议接口：
+POST /employment-registrations
+GET /employment-registrations/{citizen_id}
+
+POST /employment-support-applications
+GET /employment-support-applications/{application_id}
+
+GET /citizens/{citizen_id}/employment-status
+PATCH /employment-support-applications/{application_id}/status
+建议功能：
+	•	创建就业登记；
+	•	查询就业状态；
+	•	验证就业信息；
+	•	创建扶持申请；
+	•	初步判断资格；
+	•	更新申请状态。
+技术交付：
+	•	FastAPI代码；
+	•	SQLite数据库；
+	•	输入输出模型；
+	•	状态转换；
+	•	至少4个API测试；
+	•	Swagger截图。
+C5. 日志模拟参数设计
+协助B和D确定：
+	•	活动持续时间；
+	•	等待时间；
+	•	资源名称；
+	•	通过、补件、拒绝比例；
+	•	时间戳顺序；
+	•	并行活动时间；
+	•	不同流程变体。
+C6. 报告写作
+C主写：
+	•	Business Process Modelling Method；
+	•	BPMN Modeling Convention；
+	•	Semantic Effect Annotation Method；
+	•	Immediate Effects；
+	•	Cumulative Effect Scenarios；
+	•	P3 Source Mapping；
+	•	P3 Process Description；
+	•	Employment Service Implementation。
+C7. 复核内容
+	•	复核B的P1；
+	•	检查D的P2基本结构；
+	•	检查全部Gateway；
+	•	检查Pool、Lane和Message Flow；
+	•	检查流程是否存在死路；
+	•	检查所有效果编号。
+C8. 最终交付物
+BPMN Modeling Convention
+P3 BPMN
+P3 Official Source Mapping
+P3 Semantic Effects
+Unified Semantic Annotation Template
+Employment Service
+Employment API Tests
+Part C Report Draft
+C9. 检索与学习关键词
+BPMN pool lane
+sequence flow message flow
+exclusive gateway
+parallel gateway
+intermediate event
+boundary event
+data object BPMN
+subprocess BPMN
+
+semantic effect annotation
+immediate effect
+cumulative effect scenario
+first-order logic process annotation
+effect accumulation BPMN
+alternative effect scenarios
+
+武汉 就业登记 办事指南
+武汉 就业扶持 申请流程
+武汉 高校毕业生 就业补贴
+就业扶持 资格条件
+
+FastAPI employment API
+workflow state transition
+SQLite application service
+process timestamp simulation
+
+D：企业架构、住房流程与住房服务负责人
+角色名称
+Enterprise Architecture Lead / Housing Service Developer
+D的主要职责
+D1. 三层ArchiMate设计
+负责最终整合：
+Business Layer
+	•	Citizen；
+	•	Public Security Department；
+	•	Human Resources Department；
+	•	Housing Security Department；
+	•	CityStart Platform；
+	•	六项Business Service；
+	•	三个Business Process；
+	•	Business Roles和Business Objects。
+Application Layer
+	•	CityStart Portal；
+	•	API Gateway；
+	•	Residence Application Service；
+	•	Employment Application Service；
+	•	Housing Application Service；
+	•	Matching Application Service；
+	•	数据存储组件。
+Technology Layer
+	•	User Device；
+	•	Web Browser；
+	•	Application Server；
+	•	Backend Runtime；
+	•	Database System；
+	•	Docker Container或Process；
+	•	Network；
+	•	Deployed Artifacts。
+协作方式：
+	•	B提供公安业务元素；
+	•	C提供人社业务元素；
+	•	D提供住房业务元素；
+	•	E提供Gateway及应用服务元素；
+	•	F提供Portal及技术部署元素；
+	•	A确认总体边界；
+	•	D完成符号、关系、布局和最终出图。
+D2. P2住房补贴BPMN
+负责：
+P2：住房租赁补贴申请与资格核验流程
+建议参与者：
+	•	Citizen；
+	•	CityStart Platform；
+	•	Housing Security Department；
+	•	Employment Information Service。
+建议任务：
+Submit Housing Subsidy Application
+Check Submitted Documents
+Request Additional Documents
+Verify Employment Information
+Verify Housing Information
+Combine Verification Results
+Assess Eligibility
+Review Application
+Approve or Reject
+Notify Applicant
+重点使用：
+	•	Parallel Gateway；
+	•	XOR Gateway；
+	•	Message Flow；
+	•	Data Object；
+	•	Timer Event；
+	•	补件循环；
+	•	多参与者协作。
+D3. P2语义效果
+负责：
+	•	P2即时效果英文；
+	•	一阶逻辑；
+	•	累计效果场景；
+	•	BPMN图上标注；
+	•	单独说明页。
+D4. Housing Service开发
+建议接口：
+POST /housing-subsidy-applications
+GET /housing-subsidy-applications/{application_id}
+
+POST /housing-subsidy-applications/{application_id}/documents
+GET /citizens/{citizen_id}/housing-status
+
+POST /housing-eligibility/check
+PATCH /housing-subsidy-applications/{application_id}/status
+建议功能：
+	•	创建住房补贴申请；
+	•	查询申请；
+	•	补充材料；
+	•	查询住房状态；
+	•	读取就业信息；
+	•	基础资格判断；
+	•	更新审核状态。
+技术交付：
+	•	FastAPI；
+	•	SQLite；
+	•	请求与返回模型；
+	•	基础服务调用；
+	•	至少4个API测试。
+D5. P2事件日志模拟
+生成：
+	•	直接通过；
+	•	补件后通过；
+	•	就业信息核验失败；
+	•	住房信息核验失败；
+	•	资格不符；
+	•	审核延迟；
+	•	并行核验顺序不同。
+D6. 报告写作
+D主写：
+	•	Enterprise Architecture Method；
+	•	Business Layer；
+	•	Application Layer；
+	•	Technology Layer；
+	•	Cross-layer Relationships；
+	•	Business–IT Alignment；
+	•	P2 Source Mapping；
+	•	P2 Process Description；
+	•	Housing Service Implementation。
+D7. 复核内容
+	•	复核C的P3；
+	•	检查ArchiMate与代码架构；
+	•	检查Application Service和微服务对应；
+	•	检查P2并行分支；
+	•	检查技术层和部署方式一致。
+D8. 最终交付物
+Three-layer ArchiMate Model
+Architecture Element List
+Cross-layer Relationship Explanation
+P2 BPMN
+P2 Official Source Mapping
+P2 Semantic Effects
+Housing Service
+P2 Event Log Simulator
+Enterprise Architecture Report Section
+D9. 检索与学习关键词
+ArchiMate Business Layer
+Business Actor Business Role
+Business Service Business Process
+Application Component
+Application Service
+Application Interface
+Technology Node
+System Software
+Artifact deployment
+ArchiMate realization relationship
+ArchiMate serving relationship
+Business IT alignment
+
+武汉 住房租赁补贴 条件
+武汉 公租房 申请流程
+武汉 住房保障 办事指南
+租房补贴 资格审核
+收入核验 房产核验
+
+BPMN parallel gateway
+BPMN multi-agency verification
+BPMN document resubmission
+BPMN eligibility approval
+
+FastAPI housing service
+FastAPI httpx service call
+housing eligibility API
+workflow application status
+
+E：SoaML、API Gateway与服务组合负责人
+角色名称
+SoaML and Service Composition Lead / API Gateway Developer
+E的主要职责
+E1. SoaML Service Architecture
+负责表示：
+	•	Citizen；
+	•	CityStart Platform；
+	•	Public Security Department；
+	•	Human Resources Department；
+	•	Housing Security Department；
+	•	各参与者提供和使用的服务；
+	•	平台如何连接不同服务提供者。
+E2. Service Interfaces
+设计：
+	•	Residence Service Interface；
+	•	Employment Service Interface；
+	•	Housing Service Interface；
+	•	Matching Service Interface；
+	•	Service Point；
+	•	Request Point。
+每个接口需要明确：
+	•	Operation；
+	•	Input；
+	•	Output；
+	•	Error Result；
+	•	对应真实API。
+E3. Service Contracts及行为
+至少完成主要Service Contract，包括：
+	•	Provider；
+	•	Consumer；
+	•	双方角色；
+	•	数据交换；
+	•	职责；
+	•	成功条件；
+	•	失败条件；
+	•	Contract Behaviour。
+行为可以使用Sequence Diagram或Activity Diagram表达。
+E4. Service Composition
+说明CityStart如何组合：
+Residence Service
+Employment Service
+Housing Service
+Matching Service
+最终生成统一的新市民服务计划。
+SoaML部分需要覆盖Service Architecture、Service Interfaces、Service Contracts及其Behaviour和Service Composition。
+E5. API Gateway开发
+前端统一调用Gateway，而不是直接调用各业务服务。
+建议路由：
+/api/residence/*
+/api/employment/*
+/api/housing/*
+/api/recommendations/*
+基础功能：
+	•	接收Portal请求；
+	•	转发到对应服务；
+	•	返回统一响应；
+	•	处理服务不可用；
+	•	处理超时；
+	•	统一错误格式。
+核心服务组合接口：
+GET /api/citizens/{citizen_id}/service-plan
+执行顺序：
+	1.	查询Residence Service；
+	2.	查询Employment Service；
+	3.	查询Housing Service；
+	4.	汇总用户状态；
+	5.	调用Matching Service；
+	6.	返回综合办理计划。
+E6. 后端统一启动
+时间允许时负责：
+docker-compose.yml
+.env.example
+backend service URLs
+port configuration
+如Docker影响稳定性，则准备统一启动脚本。
+E7. Gateway测试
+至少测试：
+	•	Residence路由；
+	•	Employment路由；
+	•	Housing路由；
+	•	Matching路由；
+	•	综合Service Plan接口；
+	•	服务不可用；
+	•	请求超时；
+	•	用户不存在；
+	•	返回数据格式错误。
+E8. 报告写作
+E主写：
+	•	SoaML Service Architecture；
+	•	Service Interfaces；
+	•	Service Contracts；
+	•	Contract Behaviour；
+	•	Service Composition；
+	•	API Gateway Design；
+	•	Service Orchestration；
+	•	Inter-service Communication；
+	•	Gateway Implementation；
+	•	Deployment。
+E9. 复核内容
+	•	检查A、B、C、D的接口能否被Gateway调用；
+	•	检查SoaML接口和实际API；
+	•	检查Service Contract中的操作是否已经实现；
+	•	向A提供SoaML—API映射；
+	•	检查BPMN Service Task与服务接口是否对应。
+E10. 最终交付物
+SoaML Service Architecture
+Service Interface Model
+Service Contract Model
+Contract Behaviour Model
+Service Composition Model
+API Gateway
+Service Plan Aggregation Endpoint
+Gateway Tests
+Backend Startup Configuration
+Part D and Gateway Report Sections
+E11. 检索与学习关键词
+SoaML Participant
+SoaML Service Architecture
+SoaML ServiceInterface
+SoaML ServicePoint
+SoaML RequestPoint
+SoaML ServiceContract
+SoaML role
+SoaML choreography
+SoaML contract behaviour
+SoaML service composition
+
+API Gateway
+FastAPI API Gateway
+FastAPI httpx
+route forwarding
+service aggregation
+service orchestration
+inter-service communication
+microservice timeout handling
+microservice error handling
+Docker Compose FastAPI services
+
+F：前端Portal、流程挖掘、测试与演示负责人
+角色名称
+Front-end and Process Analytics Lead / Demonstration Coordinator
+F的主要职责
+F1. CityStart Portal
+建议页面：
+	1.	Home；
+	2.	Citizen Profile；
+	3.	Residence Registration；
+	4.	Residence Permit Application；
+	5.	Employment Registration；
+	6.	Employment Support Application；
+	7.	Housing Subsidy Application；
+	8.	Service Recommendation；
+	9.	Application Status Dashboard；
+	10.	Process Analytics Results。
+技术建议：
+	•	HTML；
+	•	Bootstrap；
+	•	JavaScript；
+	•	fetch()；
+	•	可选Jinja2。
+Portal统一调用E的API Gateway。
+F2. 前端主要功能
+	•	填写用户基本信息；
+	•	提交居住申请；
+	•	提交就业登记；
+	•	提交住房申请；
+	•	查询综合服务计划；
+	•	展示Matching结果；
+	•	展示缺少材料；
+	•	展示申请状态；
+	•	显示基础错误信息。
+不需要开发复杂登录、支付、地图、动画或移动App。
+F3. 事件日志整合
+统一格式：
+case_id
+process_name
+activity
+timestamp
+resource
+outcome
+service_name
+负责：
+	•	接收B的P1日志；
+	•	接收D的P2日志；
+	•	检查字段；
+	•	清理数据；
+	•	转换CSV或XES；
+	•	确认Activity与BPMN一致；
+	•	准备流程挖掘输入。
+F4. Process Mining
+使用ProM或PM4Py完成：
+	•	流程发现；
+	•	主路径分析；
+	•	流程变体分析；
+	•	补件循环分析；
+	•	拒绝路径分析；
+	•	平均处理时间；
+	•	最慢活动；
+	•	资源表现；
+	•	发现模型与原始BPMN的比较。
+作业允许自行编写模拟器生成日志，但需要对至少两个流程进行流程挖掘并详细解释结果。
+F5. 用户流程测试
+测试：
+场景	预期结果
+正常提交居住申请	成功创建申请
+缺少必填字段	显示错误
+查询综合服务计划	展示推荐服务
+Gateway不可用	显示服务错误
+用户有本地住房	不推荐租赁补贴
+用户存在多个申请	状态页正确显示
+F6. 最终演示视频
+负责：
+	•	确定演示顺序；
+	•	汇总每个人的讲解片段；
+	•	录屏与剪辑；
+	•	控制在10分钟以内；
+	•	检查画面、声音和系统稳定性。
+建议讲解分配：
+内容	讲解人
+项目背景和总体架构	A
+Residence Service	B
+Employment Service	C
+Housing Service	D
+SoaML、Gateway和服务组合	E
+Matching Service	A
+Portal完整场景	F
+Process Mining结果	F
+总结	A
+F7. 报告写作
+F主写：
+	•	Front-end Design；
+	•	Portal Implementation；
+	•	Event Log Generation；
+	•	Simulation Data；
+	•	Process Mining Method；
+	•	Process Discovery；
+	•	Variant Analysis；
+	•	Bottleneck Analysis；
+	•	User Scenario Testing；
+	•	Demonstration Description。
+F8. 复核内容
+	•	检查README是否能指导运行；
+	•	检查前端与Gateway接口；
+	•	检查日志活动与BPMN；
+	•	检查截图和图表质量；
+	•	检查演示流程稳定性；
+	•	检查视频时长。
+F9. 最终交付物
+Portal Source Code
+User Interface Pages
+Front-end Tests
+Cleaned P1 and P2 Event Logs
+Process Mining Models
+Process Analytics Charts
+Analytics Report Section
+Demo Scenario
+Final Demo Video
+F10. 检索与学习关键词
+Bootstrap web form
+JavaScript fetch API
+FastAPI frontend integration
+API Gateway frontend
+application status dashboard
+
+event log case id activity timestamp resource
+process mining CSV
+XES event log
+PM4Py process discovery
+PM4Py alpha miner
+directly follows graph
+process variant analysis
+bottleneck analysis
+throughput time
+conformance checking
+
+end-to-end user testing
+microservice demonstration
+system demo recording
+
+3. 各作业部分负责人
+作业部分	主负责人	全员协作方式
+Part A：服务识别与BSRL	B	A定范围；C、D提供业务资料；E检查接口；F整理展示
+Part B：ArchiMate	D	每人提供本人模块元素，D整合
+Part C：BPMN与语义效果	C	B负责P1，D负责P2，C负责P3
+Part D：SoaML	E	各服务负责人确认接口和合同
+Part E：微服务实现	全员	A Matching；B Residence；C Employment；D Housing；E Gateway；F Portal
+Part F：流程分析	F	B、D生成日志；C设计模拟规则；A、E检查一致性
+最终报告	A整合	每人负责本人章节并按反馈修改
+最终演示	F组织	每个人讲解本人负责内容
+4. 交叉复核安排
+初稿负责人	第一复核人	最终检查
+A：总体架构、Matching	E	全组确认
+B：BSRL、P1、Residence	D	A
+C：BPMN规范、P3、Employment	B	A
+D：ArchiMate、P2、Housing	C	A
+E：SoaML、Gateway	A	C检查模型规范
+F：Portal、Process Analytics	E	A
+每项成果应经历：
+初稿完成 → 交叉复核 → 修改 → 组长最终检查
+
+5. 报告章节分配
+报告章节	主笔
+Executive Summary	A
+Introduction、Problem、Objectives、Scope	A
+Service Identification and BSRL	B
+Enterprise Architecture	D
+BPMN Design	C统筹，B和D提供各自流程
+Semantic Effect Annotation	C统筹，B和D完成各自效果
+SoaML Service Design	E
+Overall Microservices Architecture	A、E
+Service Matching Service	A
+Residence Service	B
+Employment Service	C
+Housing Service	D
+API Gateway	E
+Front-end Portal	F
+Process Analytics	F
+Integration and Consistency	A
+Testing	A总体，其他成员提供模块测试
+Project Management	A
+Limitations and Future Work	A统筹，全员提供
+Conclusion	A
+README、API Documents、References	B
+Logs、Screenshots、Appendices	B、F
+Final Formatting and Quality Check	A
+6. 每周成果证据
+每个人每周至少提供两项可验证成果：
+	•	官方资料整理；
+	•	Service Catalogue或BSRL；
+	•	.drawio源文件；
+	•	BPMN、ArchiMate或SoaML截图；
+	•	语义效果表；
+	•	源代码；
+	•	Git提交记录；
+	•	Swagger或API测试；
+	•	事件日志；
+	•	流程挖掘结果；
+	•	报告章节；
+	•	复核意见；
+	•	修改记录；
+	•	演示片段。
+会议纪要必须包含：
+会议日期和时间
+出席情况
+每人本周进展
+成果检查结果
+讨论与决策
+存在的问题
+下一周任务
+负责人和截止日期
+实际成果附件
+课程要求周会真实发生，并在附录中提供每名成员完成的实际工作，以支持个人贡献评价。
+
+7. 建议共享目录
+CityStart/
+├── 01_Project_Management/
+│   ├── WBS/
+│   ├── Meeting_Reports/
+│   └── Contribution_Evidence/
+├── 02_Official_Sources/
+├── 03_Service_Identification_BSRL/
+├── 04_ArchiMate/
+├── 05_BPMN_Semantic_Effects/
+├── 06_SoaML/
+├── 07_Source_Code/
+│   ├── portal/
+│   ├── api-gateway/
+│   ├── residence-service/
+│   ├── employment-service/
+│   ├── housing-service/
+│   └── service-matching-service/
+├── 08_Event_Logs_Process_Mining/
+├── 09_Testing/
+├── 10_Report/
+└── 11_Demo_Video/
+
+8. 资料和工具使用说明
+每名成员应优先使用：
+	•	课程PPT；
+	•	武汉市政府或相关部门官方资料；
+	•	FastAPI、PM4Py等官方技术文档；
+	•	小组自己完成的模型和代码；
+	•	真实的测试与运行结果。
+上面的关键词用于检索课程知识、官方流程和技术文档。最终报告、模型、代码和分析必须由成员本人理解、核实并完成，所有外部流程、观点、图表和定义都要正确引用。项目说明明确要求小组独立完成，并禁止在本项目中使用生成式AI。
+
+
+
+
+大家好，因为现阶段各模块由负责人独立开发、后期再统一集成，为避免最后出现语言、端口、字段和数据库无法对应的问题，现确定以下 CityStart Technical Baseline。该基线只统一影响集成的部分，各模块内部实现方式仍由负责人自行决定。
+
+一、统一技术选型
+
+1. 后端统一使用 Python 3.12。
+2. Residence、Employment、Housing、Matching Service和API Gateway统一使用FastAPI、Pydantic v2和Uvicorn。
+3. API Gateway调用其他服务时使用HTTPX。
+4. Portal原则上使用HTML、Bootstrap和JavaScript fetch，不增加React、Vue等额外框架，除非F和E确认确有需要。
+5. 服务之间统一使用HTTP REST和JSON通信。
+
+二、服务及端口
+
+* CityStart Portal：3000
+* API Gateway：8000
+* Residence Service：8001
+* Employment Service：8002
+* Housing Service：8003
+* Service Matching Service：8004
+
+端口和服务地址必须通过配置或环境变量管理，不要在业务代码中到处写死。
+
+三、数据库与文件处理
+
+1. Residence Service、Employment Service和Housing Service分别管理自己的SQLite数据库，不使用共享数据库：
+
+   * residence.db
+   * employment.db
+   * housing.db
+2. Matching Service保持stateless，不设置数据库。
+3. Portal和Gateway不直接访问业务数据库。
+4. 当前项目使用模拟数据，不连接真实政府数据库。
+5. 申请材料原则上只保存document_id、application_id、document_type、file_name、verification_status和uploaded_at等模拟记录，不增加云存储或复杂文件系统。确需演示文件上传时，再由对应服务使用本地uploads目录处理。
+
+四、统一接口格式
+
+1. 字段名称统一使用snake_case。
+2. 时间统一使用ISO 8601格式，例如：
+   2026-08-05T10:30:00Z
+3. HTTP请求和响应统一使用JSON。
+4. 服务名称和编号必须统一使用S1—S6，不自行修改正式英文名称。
+5. 状态值统一使用小写英文，例如：
+   pending、under_review、approved、rejected、additional_documents_required。
+6. 错误响应统一采用以下结构：
+
+{
+"error": {
+"code": "VALIDATION_ERROR",
+"message": "The request body is invalid.",
+"details": []
+}
+}
+
+五、调用关系
+
+系统调用关系固定为：
+
+Citizen → Portal → API Gateway → Microservices
+
+Portal只能调用API Gateway，不能直接调用Residence、Employment、Housing或Matching Service，也不能直接访问数据库。
+
+Gateway负责路由转发、服务组合、超时处理、服务不可用处理和统一错误返回。
+
+六、各模块最低交付内容
+
+每个后端模块需要提供：
+
+* 完整源代码；
+* requirements.txt；
+* README和启动方法；
+* .env.example或配置说明；
+* 数据库初始化方法或示例数据；
+* Swagger测试结果；
+* 至少4个测试案例；
+* 示例Request和Response。
+
+Matching Service至少提供5个测试案例，目前A的独立版本已经完成10个规则测试。
+
+七、API冻结流程
+
+1. B、C、D分别整理自己服务的Endpoint、Request Fields、Response Fields、Status Values和示例数据，提交给E。
+2. A向E提供Matching Service的API Contract。
+3. E负责汇总Endpoint List、字段、状态、错误格式、端口和环境变量，形成统一API Baseline。
+4. A检查服务名称以及BSRL、BPMN、ArchiMate、SoaML、API和Event Log之间是否一致。
+5. API确认后不得私自修改。确需修改时，需要说明原因和受影响模块，由E确认技术影响、A确认跨模型影响，并同步更新接口文档。
+
+八、成员可以自行决定的内容
+
+在不改变统一接口的情况下，各负责人可以自行决定：
+
+* 服务内部文件夹结构；
+* 函数和类的组织方式；
+* 使用sqlite3或SQLAlchemy；
+* 数据库内部表结构；
+* 单元测试组织方式；
+* Portal具体页面样式；
+* 模块内部规则实现。
+
+请大家检查自己的模块是否与以上基线存在冲突。如有问题及时提出，确认后再按照统一基线继续开发，避免最后集成阶段集中修改。
