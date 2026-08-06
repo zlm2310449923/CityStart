@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}CityStart - Home{% endblock %}
+{% block content %}
+<div class="hero-section text-center">
+    <h1 class="display-4 fw-bold">Welcome to CityStart</h1>
+    <p class="lead mt-3">A One-Stop Settlement and Employment Service Platform for New Urban Residents</p>
+    <p class="mt-2">Fast, convenient access to residence, employment, and housing services in Wuhan.</p>
+</div>
+
+<div class="row g-4 mt-3">
+    <div class="col-md-4">
+        <div class="card card-hover h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-house-door service-icon"></i>
+                <h5 class="card-title mt-2">Residence Services</h5>
+                <p class="card-text text-muted">Register your residence and apply for a residence permit.</p>
+                <a href="/residence-registration" class="btn btn-outline-primary btn-sm">Residence Registration</a>
+                <a href="/residence-permit" class="btn btn-outline-primary btn-sm">Residence Permit</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-hover h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-briefcase service-icon"></i>
+                <h5 class="card-title mt-2">Employment Services</h5>
+                <p class="card-text text-muted">Register your employment status and apply for employment support.</p>
+                <a href="/employment-registration" class="btn btn-outline-primary btn-sm">Employment Registration</a>
+                <a href="/employment-support" class="btn btn-outline-primary btn-sm">Employment Support</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-hover h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-building-check service-icon"></i>
+                <h5 class="card-title mt-2">Housing Services</h5>
+                <p class="card-text text-muted">Check eligibility and apply for housing rental subsidies.</p>
+                <a href="/housing-subsidy" class="btn btn-outline-primary btn-sm">Housing Subsidy</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mt-2">
+    <div class="col-md-6">
+        <div class="card card-hover h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-lightbulb service-icon"></i>
+                <h5 class="card-title mt-2">Smart Recommendations</h5>
+                <p class="card-text text-muted">Get explainable, personalised service recommendations based on your current status.</p>
+                <a href="/service-recommendation" class="btn btn-outline-primary">Get Recommendations</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card card-hover h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-graph-up service-icon"></i>
+                <h5 class="card-title mt-2">Application Status & Analytics</h5>
+                <p class="card-text text-muted">Track your application status and view process analytics results.</p>
+                <a href="/application-status" class="btn btn-outline-primary btn-sm">Status Dashboard</a>
+                <a href="/process-analytics" class="btn btn-outline-primary btn-sm">Analytics</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

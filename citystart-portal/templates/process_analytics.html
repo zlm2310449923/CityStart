@@ -1,0 +1,342 @@
+{% extends "base.html" %}
+{% block title %}Process Analytics - CityStart{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0"><i class="bi bi-graph-up me-2"></i>Process Analytics Results</h2>
+    <span class="text-muted small" id="generated-at"></span>
+</div>
+
+<div class="alert alert-secondary small">
+    All figures on this page are loaded from <code>static/analytics.json</code>, produced by
+    <code>process-mining/analysis.py</code>. No value is hard-coded: re-running the analysis
+    updates this page and the report together.
+</div>
+
+<div id="load-error"></div>
+
+<div id="analytics-body" style="display:none;">
+    <ul class="nav nav-tabs mb-4">
+        <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#overview">Overview</a></li>
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#p1">P1 Analysis</a></li>
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#p2">P2 Analysis</a></li>
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#models">Discovered Models</a></li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="overview">
+            <div class="card">
+                <div class="card-header bg-primary text-white">Cross-Process Comparison</div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                                <tr><th>Metric</th><th>P1 (Residence Permit)</th><th>P2 (Housing Subsidy)</th></tr>
+                            </thead>
+                            <tbody id="comparison-body"></tbody>
+                        </table>
+                    </div>
+                    <div id="key-findings"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="p1"><div id="p1-content"></div></div>
+        <div class="tab-pane fade" id="p2"><div id="p2-content"></div></div>
+
+        <div class="tab-pane fade" id="models">
+            <div class="card">
+                <div class="card-header bg-info text-white">Discovered Process Models (Inductive Miner)</div>
+                <div class="card-body" id="models-content"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function esc(s) {
+    const d = document.createElement('div');
+    d.textContent = s == null ? '' : String(s);
+    return d.innerHTML;
+}
+
+function variantTable(p) {
+    const rows = p.variants.control_flow_variants.map(v => `
+        <tr>
+            <td>${v.rank}</td>
+            <td class="text-end">${v.cases}</td>
+            <td class="text-end">${v.percentage}%</td>
+            <td class="text-end">${v.length}</td>
+            <td class="small">${esc(Object.keys(v.designed_variants).join(', ') || '-')}</td>
+            <td class="small text-muted">${esc(v.trace.join(' \u2192 '))}</td>
+        </tr>`).join('');
+    return `
+        <h5>Variant Analysis</h5>
+        <p class="small text-muted">
+            ${p.variants.distinct_control_flow_variants} distinct control-flow variants across
+            ${p.variants.total_cases} cases, arising from
+            ${p.variants.designed_variants.length} designed variants. A designed variant that
+            differs only in timing collapses onto an existing control-flow trace; conversely a
+            single designed variant can split into several traces when concurrent activities
+            complete in different orders.
+        </p>
+        <div class="table-responsive">
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr><th>#</th><th>Cases</th><th>%</th><th>Len</th><th>Designed Variant(s)</th><th>Trace</th></tr>
+                </thead>
+                <tbody>${rows}</tbody>
+            </table>
+        </div>`;
+}
+
+function performanceTable(p) {
+    const t = p.performance.throughput_days;
+    const acts = p.performance.activities.map(a => `
+        <tr>
+            <td>${esc(a.activity)}</td>
+            <td class="text-end">${a.occurrences}</td>
+            <td class="text-end">${a.mean_hours}</td>
+            <td class="text-end">${a.median_hours}</td>
+            <td class="text-end">${a.max_hours}</td>
+            <td class="text-end">${a.share_of_total_time_pct}%</td>
+            <td class="text-center">${a.mean_hours > p.performance.bottleneck_threshold_hours
+                ? '<span class="badge bg-warning text-dark">Bottleneck</span>' : ''}</td>
+        </tr>`).join('');
+
+    let sync = '';
+    if (p.performance.parallel_synchronisation) {
+        const s = p.performance.parallel_synchronisation;
+        const slower = Object.entries(s.slower_branch_frequency)
+            .map(([k, v]) => `${esc(k)}: ${v} cases`).join('; ');
+        sync = `
+            <hr>
+            <h5>Parallel Gateway Synchronisation Cost</h5>
+            <p class="small text-muted">
+                The join after the Parallel Gateway cannot fire until the slower verification
+                branch finishes. The gap between the two branch completions is idle time that
+                per-activity statistics cannot reveal.
+            </p>
+            <ul>
+                <li>Cases with both branches: <strong>${s.cases_with_parallel_branches}</strong></li>
+                <li>Mean idle wait: <strong>${s.idle_wait_hours.mean} h</strong>
+                    (median ${s.idle_wait_hours.median} h, max ${s.idle_wait_hours.max} h)</li>
+                <li>Slower branch: ${slower}</li>
+            </ul>`;
+    }
+
+    return `
+        <hr>
+        <h5>Throughput Time</h5>
+        <table class="table table-sm table-bordered w-auto">
+            <tbody>
+                <tr><th>Mean</th><td class="text-end">${t.mean} days</td></tr>
+                <tr><th>Median</th><td class="text-end">${t.median} days</td></tr>
+                <tr><th>90th percentile</th><td class="text-end">${t.p90} days</td></tr>
+                <tr><th>Max</th><td class="text-end">${t.max} days</td></tr>
+                <tr><th>Min</th><td class="text-end">${t.min} days</td></tr>
+            </tbody>
+        </table>
+        <hr>
+        <h5>Bottleneck Analysis</h5>
+        <p class="small text-muted">
+            Duration is the elapsed time attributable to each activity (waiting plus
+            processing). Activities whose mean exceeds
+            ${p.performance.bottleneck_threshold_hours} h are flagged. The
+            "% of total time" column identifies where the process actually spends its time,
+            which matters more than the mean alone.
+        </p>
+        <div class="table-responsive">
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr><th>Activity</th><th>Count</th><th>Mean (h)</th><th>Median (h)</th>
+                        <th>Max (h)</th><th>% Total Time</th><th></th></tr>
+                </thead>
+                <tbody>${acts}</tbody>
+            </table>
+        </div>
+        ${sync}`;
+}
+
+function outcomeAndResourceTable(p) {
+    const o = p.outcomes;
+    const res = p.resources.map(r => `
+        <tr>
+            <td>${esc(r.resource)}</td>
+            <td class="text-end">${r.activity_types}</td>
+            <td class="text-end">${r.events}</td>
+            <td class="text-end">${r.mean_hours}</td>
+            <td class="text-end">${r.total_hours}</td>
+        </tr>`).join('');
+    return `
+        <hr>
+        <h5>Outcomes</h5>
+        <ul>
+            <li>Approved: <strong>${o.approved}</strong> (${o.approved_pct}%)</li>
+            <li>Rejected: <strong>${o.rejected}</strong> (${o.rejected_pct}%)</li>
+            <li>Required additional documents: <strong>${o.required_supplement}</strong>
+                (${o.required_supplement_pct}%)</li>
+            <li>Cases containing rework/cycles: <strong>${p.performance.rework_cases}</strong>
+                (${p.performance.rework_percentage}%)</li>
+        </ul>
+        <hr>
+        <h5>Resource Analysis</h5>
+        <div class="table-responsive">
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr><th>Resource</th><th>Activity Types</th><th>Events</th>
+                        <th>Mean (h)</th><th>Total (h)</th></tr>
+                </thead>
+                <tbody>${res}</tbody>
+            </table>
+        </div>`;
+}
+
+function conformanceBlock(p) {
+    const s = p.conformance.structural;
+    const r = p.conformance.replay;
+    const dev = s.deviating_traces.length
+        ? `<ul class="small">${s.deviating_traces.map(d =>
+              `<li>${d.cases} case(s): ${esc(d.trace)}</li>`).join('')}</ul>`
+        : '<p class="small text-muted mb-0">No deviating traces.</p>';
+
+    let replay = `<p class="text-muted small">Replay unavailable: ${esc(r.reason || 'n/a')}</p>`;
+    if (r.available) {
+        replay = `
+            <ul>
+                <li>Algorithm: ${esc(r.algorithm)}</li>
+                <li>Mean trace fitness: <strong>${r.mean_trace_fitness}</strong></li>
+                <li>Perfectly fitting cases: <strong>${r.perfectly_fitting_percentage}%</strong></li>
+                <li>Petri net: ${r.petri_net_places} places, ${r.petri_net_transitions}
+                    transitions (${r.silent_transitions} silent)</li>
+            </ul>
+            <p class="small text-muted mb-0">
+                Replay fitness is measured against a model discovered from this same log, so a
+                value at or near 1.0 is expected and mainly confirms the discovery step is
+                sound. The designed-path comparison above is the check that actually tests
+                agreement with the BPMN authored by B and D.
+            </p>`;
+    }
+
+    return `
+        <hr>
+        <h5>Conformance Checking</h5>
+        <div class="row">
+            <div class="col-md-6">
+                <h6 class="text-primary">Against designed BPMN paths</h6>
+                <ul>
+                    <li>Designed paths enumerated: ${s.designed_paths_enumerated}</li>
+                    <li>Conformant: <strong>${s.conformant_cases}</strong>
+                        (${s.conformant_percentage}%)</li>
+                    <li>Deviating: <strong>${s.deviating_cases}</strong></li>
+                </ul>
+                ${dev}
+            </div>
+            <div class="col-md-6">
+                <h6 class="text-primary">Token-based replay</h6>
+                ${replay}
+            </div>
+        </div>`;
+}
+
+function renderProcess(p, containerId, headerClass) {
+    document.getElementById(containerId).innerHTML = `
+        <div class="card">
+            <div class="card-header ${headerClass} text-white">
+                ${p.process_id}: ${esc(p.process_name)}
+            </div>
+            <div class="card-body">
+                <p class="small text-muted">
+                    Source log: <code>${esc(p.source_log)}</code> &mdash;
+                    ${p.events} events, ${p.variants.total_cases} cases.
+                </p>
+                ${variantTable(p)}
+                ${performanceTable(p)}
+                ${outcomeAndResourceTable(p)}
+                ${conformanceBlock(p)}
+            </div>
+        </div>`;
+}
+
+function renderComparison(data) {
+    const c = data.comparison;
+    if (!c) return;
+    document.getElementById('comparison-body').innerHTML = c.rows.map(r => `
+        <tr><th>${esc(r.metric)}</th><td>${esc(r.p1)}</td><td>${esc(r.p2)}</td></tr>`).join('');
+
+    const p1 = data.processes.P1, p2 = data.processes.P2;
+    const findings = [];
+    findings.push(`P2's mean throughput is ${c.throughput_ratio}\u00d7 that of P1.`);
+    findings.push(`P1's dominant cost is <strong>${esc(p1.performance.top_bottleneck)}</strong>, `
+        + `accounting for ${p1.performance.activities[0].share_of_total_time_pct}% of all `
+        + `recorded time.`);
+    if (p2.performance.parallel_synchronisation) {
+        findings.push(`P2's parallel verification adds a mean idle wait of `
+            + `${p2.performance.parallel_synchronisation.idle_wait_hours.mean} h at the join, `
+            + `a cost attributable to the Parallel Gateway design rather than to any single task.`);
+    }
+    findings.push(`P2 exhibits ${p2.variants.distinct_control_flow_variants} control-flow `
+        + `variants against P1's ${p1.variants.distinct_control_flow_variants}: concurrent `
+        + `verification activities complete in varying order, multiplying the observable traces `
+        + `without changing the underlying model.`);
+    findings.push(`Approval rate is ${p1.outcomes.approved_pct}% for P1 versus `
+        + `${p2.outcomes.approved_pct}% for P2, consistent with P2's additional eligibility gates.`);
+    findings.push(`Rework affects ${p1.performance.rework_percentage}% of P1 cases and `
+        + `${p2.performance.rework_percentage}% of P2 cases, driven by document supplement loops.`);
+
+    document.getElementById('key-findings').innerHTML = `
+        <hr><h5>Key Findings</h5>
+        <ul>${findings.map(f => `<li>${f}</li>`).join('')}</ul>`;
+}
+
+function renderModels(data) {
+    const blocks = ['P1', 'P2'].map(pid => {
+        const p = data.processes[pid];
+        if (!p) return '';
+        const r = p.conformance.replay;
+        if (r.available && r.model_image) {
+            const file = r.model_image.split(/[\\/]/).pop();
+            return `
+                <h6>${pid}: ${esc(p.process_name)}</h6>
+                <p class="small text-muted">
+                    ${r.petri_net_places} places, ${r.petri_net_transitions} transitions,
+                    ${r.silent_transitions} silent transitions.
+                    Rendered to <code>process-mining/output/${esc(file)}</code>.
+                </p>`;
+        }
+        return `
+            <h6>${pid}: ${esc(p.process_name)}</h6>
+            <div class="alert alert-warning small mb-3">
+                Model image not rendered.
+                ${esc(r.model_image_error || r.reason || 'Unknown reason.')}
+            </div>`;
+    }).join('<hr>');
+    document.getElementById('models-content').innerHTML = blocks;
+}
+
+(async function () {
+    try {
+        const resp = await fetch('/static/analytics.json', { cache: 'no-store' });
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        const data = await resp.json();
+
+        document.getElementById('generated-at').textContent =
+            'Analysis generated ' + data.generated_at;
+        renderComparison(data);
+        if (data.processes.P1) renderProcess(data.processes.P1, 'p1-content', 'bg-primary');
+        if (data.processes.P2) renderProcess(data.processes.P2, 'p2-content', 'bg-success');
+        renderModels(data);
+        document.getElementById('analytics-body').style.display = 'block';
+    } catch (err) {
+        document.getElementById('load-error').innerHTML = `
+            <div class="alert alert-danger">
+                <strong>Could not load analytics data.</strong> ${esc(err.message)}<br>
+                Generate it with:
+                <code>cd process-mining &amp;&amp; python generate_logs.py &amp;&amp;
+                python normalize_logs.py &amp;&amp; python analysis.py</code>
+            </div>`;
+    }
+})();
+</script>
+{% endblock %}

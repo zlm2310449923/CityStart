@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}Employment Registration - CityStart{% endblock %}
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-briefcase me-2"></i>Employment Registration (S3)</h2>
+<div id="alert-area"></div>
+
+<div class="card">
+    <div class="card-header bg-primary text-white">Register Employment</div>
+    <div class="card-body">
+        <form id="employment-form">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="citizen_id" class="form-label">Citizen ID</label>
+                    <input type="text" class="form-control" id="citizen_id" placeholder="C1001" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="full_name" class="form-label">Full Name</label>
+                    <input type="text" class="form-control" id="full_name" required>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="employer_name" class="form-label">Employer Name</label>
+                    <input type="text" class="form-control" id="employer_name" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="position" class="form-label">Position</label>
+                    <input type="text" class="form-control" id="position" required>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="start_date" class="form-label">Start Date</label>
+                    <input type="date" class="form-control" id="start_date" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="monthly_income" class="form-label">Monthly Income (CNY)</label>
+                    <input type="number" class="form-control" id="monthly_income" step="0.01">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary" id="submit-btn">Register Employment</button>
+        </form>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header bg-light">Query Employment Status</div>
+    <div class="card-body">
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" id="query-citizen-id" placeholder="Citizen ID">
+            <button class="btn btn-outline-primary" id="query-btn">Query Status</button>
+        </div>
+        <div id="query-result"></div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+document.getElementById('employment-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    setLoading('submit-btn', true);
+    const body = {
+        citizen_id: document.getElementById('citizen_id').value,
+        full_name: document.getElementById('full_name').value,
+        employer_name: document.getElementById('employer_name').value,
+        position: document.getElementById('position').value,
+        start_date: document.getElementById('start_date').value,
+        monthly_income: parseFloat(document.getElementById('monthly_income').value) || 0
+    };
+    const result = await apiPost('employment/employment-registrations', body);
+    setLoading('submit-btn', false);
+    if (result.ok) {
+        const app = result.data || {};
+        showAlert('alert-area',
+            `Employment registered. Status: ${statusBadge(app.status)}`, 'success');
+    } else {
+        showApiError('alert-area', result, 'Registration failed.');
+    }
+});
+
+document.getElementById('query-btn').addEventListener('click', async function() {
+    const citizenId = document.getElementById('query-citizen-id').value.trim();
+    if (!citizenId) return;
+    const result = await apiGet(`employment/citizens/${encodeURIComponent(citizenId)}/employment-status`);
+    if (result.ok) {
+        renderJson('query-result', result.data);
+    } else {
+        document.getElementById('query-result').innerHTML =
+            `<p class="text-danger mb-0">[${escapeHtml(result.error.code)}] ${escapeHtml(result.error.message)}</p>`;
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,884 @@
+{
+  "generated_at": "2026-08-05T17:02:44",
+  "pm4py_available": true,
+  "processes": {
+    "P1": {
+      "process_id": "P1",
+      "process_name": "Residence Permit Application and Additional Document Process",
+      "source_log": "logs\\validated\\p1_event_log.csv",
+      "events": 708,
+      "variants": {
+        "total_cases": 100,
+        "distinct_control_flow_variants": 5,
+        "control_flow_variants": [
+          {
+            "rank": 1,
+            "cases": 49,
+            "percentage": 49.0,
+            "length": 6,
+            "trace": [
+              "Submit Residence Permit Application",
+              "Validate Identity",
+              "Check Submitted Documents",
+              "Review Application",
+              "Approve Application",
+              "Notify Applicant"
+            ],
+            "designed_variants": {
+              "V1_DirectApproval": 45,
+              "V6_DelayedReview": 4
+            },
+            "sample_case_ids": [
+              "P1-C0001",
+              "P1-C0002",
+              "P1-C0003"
+            ]
+          },
+          {
+            "rank": 2,
+            "cases": 20,
+            "percentage": 20.0,
+            "length": 9,
+            "trace": [
+              "Submit Residence Permit Application",
+              "Validate Identity",
+              "Check Submitted Documents",
+              "Request Additional Documents",
+              "Submit Additional Documents",
+              "Check Submitted Documents",
+              "Review Application",
+              "Approve Application",
+              "Notify Applicant"
+            ],
+            "designed_variants": {
+              "V2_SingleSupplement": 20
+            },
+            "sample_case_ids": [
+              "P1-C0046",
+              "P1-C0047",
+              "P1-C0048"
+            ]
+          },
+          {
+            "rank": 3,
+            "cases": 15,
+            "percentage": 15.0,
+            "length": 6,
+            "trace": [
+              "Submit Residence Permit Application",
+              "Validate Identity",
+              "Check Submitted Documents",
+              "Review Application",
+              "Reject Application",
+              "Notify Applicant"
+            ],
+            "designed_variants": {
+              "V3_ReviewRejection": 15
+            },
+            "sample_case_ids": [
+              "P1-C0066",
+              "P1-C0067",
+              "P1-C0068"
+            ]
+          },
+          {
+            "rank": 4,
+            "cases": 10,
+            "percentage": 10.0,
+            "length": 12,
+            "trace": [
+              "Submit Residence Permit Application",
+              "Validate Identity",
+              "Check Submitted Documents",
+              "Request Additional Documents",
+              "Submit Additional Documents",
+              "Check Submitted Documents",
+              "Request Additional Documents",
+              "Submit Additional Documents",
+              "Check Submitted Documents",
+              "Review Application",
+              "Approve Application",
+              "Notify Applicant"
+            ],
+            "designed_variants": {
+              "V4_MultipleSupplements": 10
+            },
+            "sample_case_ids": [
+              "P1-C0081",
+              "P1-C0082",
+              "P1-C0083"
+            ]
+          },
+          {
+            "rank": 5,
+            "cases": 6,
+            "percentage": 6.0,
+            "length": 4,
+            "trace": [
+              "Submit Residence Permit Application",
+              "Validate Identity",
+              "Reject Application",
+              "Notify Applicant"
+            ],
+            "designed_variants": {
+              "V5_IdentityFailure": 6
+            },
+            "sample_case_ids": [
+              "P1-C0091",
+              "P1-C0092",
+              "P1-C0093"
+            ]
+          }
+        ],
+        "designed_variants": [
+          {
+            "variant": "V1_DirectApproval",
+            "cases": 45,
+            "percentage": 45.0
+          },
+          {
+            "variant": "V2_SingleSupplement",
+            "cases": 20,
+            "percentage": 20.0
+          },
+          {
+            "variant": "V3_ReviewRejection",
+            "cases": 15,
+            "percentage": 15.0
+          },
+          {
+            "variant": "V4_MultipleSupplements",
+            "cases": 10,
+            "percentage": 10.0
+          },
+          {
+            "variant": "V5_IdentityFailure",
+            "cases": 6,
+            "percentage": 6.0
+          },
+          {
+            "variant": "V6_DelayedReview",
+            "cases": 4,
+            "percentage": 4.0
+          }
+        ]
+      },
+      "performance": {
+        "bottleneck_threshold_hours": 48.0,
+        "throughput_days": {
+          "mean": 6.3,
+          "median": 5.4,
+          "p90": 11.7,
+          "max": 14.3,
+          "min": 0.3
+        },
+        "activities": [
+          {
+            "activity": "Review Application",
+            "occurrences": 94,
+            "mean_hours": 102.3,
+            "median_hours": 98.2,
+            "max_hours": 268.9,
+            "min_hours": 51.2,
+            "total_hours": 9611.6,
+            "share_of_total_time_pct": 63.5,
+            "occurrences_over_threshold": 94
+          },
+          {
+            "activity": "Submit Additional Documents",
+            "occurrences": 40,
+            "mean_hours": 68.0,
+            "median_hours": 65.7,
+            "max_hours": 114.6,
+            "min_hours": 29.2,
+            "total_hours": 2719.3,
+            "share_of_total_time_pct": 18.0,
+            "occurrences_over_threshold": 33
+          },
+          {
+            "activity": "Check Submitted Documents",
+            "occurrences": 134,
+            "mean_hours": 11.6,
+            "median_hours": 10.4,
+            "max_hours": 23.6,
+            "min_hours": 4.3,
+            "total_hours": 1556.1,
+            "share_of_total_time_pct": 10.3,
+            "occurrences_over_threshold": 0
+          },
+          {
+            "activity": "Reject Application",
+            "occurrences": 21,
+            "mean_hours": 6.4,
+            "median_hours": 6.5,
+            "max_hours": 10.4,
+            "min_hours": 3.5,
+            "total_hours": 134.8,
+            "share_of_total_time_pct": 0.9,
+            "occurrences_over_threshold": 0
+          },
+          {
+            "activity": "Approve Application",
+            "occurrences": 79,
+            "mean_hours": 6.3,
+            "median_hours": 6.3,
+            "max_hours": 11.4,
+            "min_hours": 3.1,
+            "total_hours": 500.5,
+            "share_of_total_time_pct": 3.3,
+            "occurrences_over_threshold": 0
+          },
+          {
+            "activity": "Validate Identity",
+            "occurrences": 100,
+            "mean_hours": 3.7,
+            "median_hours": 3.5,
+            "max_hours": 7.4,
+            "min_hours": 1.1,
+            "total_hours": 371.5,
+            "share_of_total_time_pct": 2.5,
+            "occurrences_over_threshold": 0
+          },
+          {
+            "activity": "Request Additional Documents",
+            "occurrences": 40,
+            "mean_hours": 3.0,
+            "median_hours": 2.7,
+            "max_hours": 5.3,
+            "min_hours": 1.3,
+            "total_hours": 121.0,
+            "share_of_total_time_pct": 0.8,
+            "occurrences_over_threshold": 0
+          },
+          {
+            "activity": "Submit Residence Permit Application",
+            "occurrences": 100,
+            "mean_hours": 0.7,
+            "median_hours": 0.7,
+            "max_hours": 1.4,
+            "min_hours": 0.2,
+            "total_hours": 70.5,
+            "share_of_total_time_pct": 0.5,
+            "occurrences_over_threshold": 0
+          },
+          {
+            "activity": "Notify Applicant",
+            "occurrences": 100,
+            "mean_hours": 0.5,
+            "median_hours": 0.5,
+            "max_hours": 1.0,
+            "min_hours": 0.1,
+            "total_hours": 46.4,
+            "share_of_total_time_pct": 0.3,
+            "occurrences_over_threshold": 0
+          }
+        ],
+        "top_bottleneck": "Review Application",
+        "rework_cases": 30,
+        "rework_percentage": 30.0
+      },
+      "outcomes": {
+        "total_cases": 100,
+        "approved": 79,
+        "approved_pct": 79.0,
+        "rejected": 21,
+        "rejected_pct": 21.0,
+        "required_supplement": 30,
+        "required_supplement_pct": 30.0
+      },
+      "resources": [
+        {
+          "resource": "Public Security Department",
+          "events": 468,
+          "activity_types": 6,
+          "mean_hours": 26.3,
+          "total_hours": 12295.5
+        },
+        {
+          "resource": "Citizen",
+          "events": 140,
+          "activity_types": 2,
+          "mean_hours": 19.9,
+          "total_hours": 2789.8
+        },
+        {
+          "resource": "CityStart Platform",
+          "events": 100,
+          "activity_types": 1,
+          "mean_hours": 0.5,
+          "total_hours": 46.4
+        }
+      ],
+      "conformance": {
+        "structural": {
+          "method": "designed-path comparison",
+          "designed_paths_enumerated": 7,
+          "conformant_cases": 100,
+          "conformant_percentage": 100.0,
+          "deviating_cases": 0,
+          "deviating_traces": []
+        },
+        "replay": {
+          "available": true,
+          "algorithm": "Inductive Miner + token-based replay",
+          "mean_trace_fitness": 1.0,
+          "perfectly_fitting_cases": 100,
+          "perfectly_fitting_percentage": 100.0,
+          "petri_net_places": 9,
+          "petri_net_transitions": 11,
+          "silent_transitions": 2,
+          "model_image": "output\\P1_inductive_miner.png"
+        }
+      }
+    },
+    "P2": {
+      "process_id": "P2",
+      "process_name": "Housing Rental Subsidy Application and Eligibility Verification Process",
+      "source_log": "logs\\validated\\p2_event_log.csv",
+      "events": 938,
+      "variants": {
+        "total_cases": 100,
+        "distinct_control_flow_variants": 9,
+        "control_flow_variants": [
+          {
+            "rank": 1,
+            "cases": 30,
+            "percentage": 30.0,
+            "length": 9,
+            "trace": [
+              "Submit Housing Subsidy Application",
+              "Check Submitted Documents",
+              "Verify Housing Information",
+              "Verify Employment Information",
+              "Combine Verification Results",
+              "Assess Eligibility",
+              "Review Application",
+              "Approve Application",
+              "Notify Applicant"
+            ],
+            "designed_variants": {
+              "V1_DirectApproval": 22,
+              "V5_ParallelBranchDelay": 8
+            },
+            "sample_case_ids": [
+              "P2-C0004",
+              "P2-C0006",
+              "P2-C0007"
+            ]
+          },
+          {
+            "rank": 2,
+            "cases": 16,
+            "percentage": 16.0,
+            "length": 9,
+            "trace": [
+              "Submit Housing Subsidy Application",
+              "Check Submitted Documents",
+              "Verify Employment Information",
+              "Verify Housing Information",
+              "Combine Verification Results",
+              "Assess Eligibility",
+              "Review Application",
+              "Approve Application",
+              "Notify Applicant"
+            ],
+            "designed_variants": {
+              "V1_DirectApproval": 16
+            },
+            "sample_case_ids": [
+              "P2-C0001",
+              "P2-C0002",
+              "P2-C0003"
+            ]
+          },
+          {
+            "rank": 3,
+            "cases": 13,
+            "percentage": 13.0,
+            "length": 12,
+            "trace": [
+              "Submit Housing Subsidy Application",
+              "Check Submitted Documents",
+              "Request Additional Documents",
+              "Submit Additional Documents",
+              "Check Submitted Documents",
+              "Verify Employment Information",
+              "Verify Housing Information",
+              "Combine Verification Results",
+              "Assess Eligibility",
+              "Review Application",
+              "Approve Application",
+              "Notify Applicant"
+            ],
+            "designed_variants": {
+              "V2_DocumentSupplement": 13
+            },
+            "sample_case_ids": [
+              "P2-C0040",
+              "P2-C0041",
+              "P2-C0045"
+            ]
+          },
+          {
+            "rank": 4,
+            "cases": 9,
+            "percentage": 9.0,
+            "length": 12,
+            "trace": [
+              "Submit Housing Subsidy Application",
+              "Check Submitted Documents",
+              "Request Additional Documents",
+              "Submit Additional Documents",
+              "Check Submitted Documents",
+              "Verify Housing Information",
+              "Verify Employment Information",
+              "Combine Verification Results",
+              "Assess Eligibility",
+              "Review Application",
+              "Approve Application",
+              "Notify Applicant"
+            ],
+            "designed_variants": {
+              "V2_DocumentSupplement": 9
+            },
+            "sample_case_ids": [
+              "P2-C0039",
+              "P2-C0042",
+              "P2-C0043"
+            ]
+          },
+          {
+            "rank": 5,
+            "cases": 9,
+            "percentage": 9.0,
+            "length": 9,
+            "trace": [
+              "Submit Housing Subsidy Application",
+              "Check Submitted Documents",
+              "Verify Housing Information",
+              "Verify Employment Information",
+              "Combine Verification Results",
+              "Assess Eligibility",
+              "Review Application",
+              "Reject Application",
+              "Notify Applicant"
+            ],
+            "designed_variants": {
+              "V3_EmploymentIneligible": 9
+            },
+            "sample_case_ids": [
+              "P2-C0064",
+              "P2-C0065",
+              "P2-C0066"
+            ]
+          },
+          {
+            "rank": 6,
+            "cases": 8,
+            "percentage": 8.0,
+            "length": 8,
+            "trace": [
+              "Submit Housing Subsidy Application",
+              "Check Submitted Documents",
+              "Verify Employment Information",
+              "Verify Housing Information",
+              "Combine Verification Results",
+              "Assess Eligibility",
+              "Reject Application",
+              "Notify Applicant"
+            ],
+            "designed_variants": {
+              "V4_HousingIneligible": 8
+            },
+            "sample_case_ids": [
+              "P2-C0077",
+              "P2-C0079",
+              "P2-C0080"
+            ]
+          },
+          {
+            "rank": 7,
+            "cases": 7,
+            "percentage": 7.0,
+            "length": 9,
+            "trace": [
+              "Submit Housing Subsidy Application",
+              "Check Submitted Documents",
+              "Verify Employment Information",
+              "Verify Housing Information",
+              "Combine Verification Results",
+              "Assess Eligibility",
+              "Review Application",
+              "Reject Application",
+              "Notify Applicant"
+            ],
+            "designed_variants": {
+              "V3_EmploymentIneligible": 7
+            },
+            "sample_case_ids": [
+              "P2-C0061",
+              "P2-C0062",
+              "P2-C0063"
+            ]
+          },
+          {
+            "rank": 8,
+            "cases": 4,
+            "percentage": 4.0,
+            "length": 8,
+            "trace": [
+              "Submit Housing Subsidy Application",
+              "Check Submitted Documents",
+              "Verify Housing Information",
+              "Verify Employment Information",
+              "Combine Verification Results",
+              "Assess Eligibility",
+              "Reject Application",
+              "Notify Applicant"
+            ],
+            "designed_variants": {
+              "V4_HousingIneligible": 4
+            },
+            "sample_case_ids": [
+              "P2-C0078",
+              "P2-C0082",
+              "P2-C0086"
+            ]
+          },
+          {
+            "rank": 9,
+            "cases": 4,
+            "percentage": 4.0,
+            "length": 5,
+            "trace": [
+              "Submit Housing Subsidy Application",
+              "Check Submitted Documents",
+              "Review Application",
+              "Reject Application",
+              "Notify Applicant"
+            ],
+            "designed_variants": {
+              "V6_DocumentRejection": 4
+            },
+            "sample_case_ids": [
+              "P2-C0097",
+              "P2-C0098",
+              "P2-C0099"
+            ]
+          }
+        ],
+        "designed_variants": [
+          {
+            "variant": "V1_DirectApproval",
+            "cases": 38,
+            "percentage": 38.0
+          },
+          {
+            "variant": "V2_DocumentSupplement",
+            "cases": 22,
+            "percentage": 22.0
+          },
+          {
+            "variant": "V3_EmploymentIneligible",
+            "cases": 16,
+            "percentage": 16.0
+          },
+          {
+            "variant": "V4_HousingIneligible",
+            "cases": 12,
+            "percentage": 12.0
+          },
+          {
+            "variant": "V5_ParallelBranchDelay",
+            "cases": 8,
+            "percentage": 8.0
+          },
+          {
+            "variant": "V6_DocumentRejection",
+            "cases": 4,
+            "percentage": 4.0
+          }
+        ]
+      },
+      "performance": {
+        "bottleneck_threshold_hours": 48.0,
+        "throughput_days": {
+          "mean": 5.7,
+          "median": 5.3,
+          "p90": 8.5,
+          "max": 11.5,
+          "min": 1.5
+        },
+        "activities": [
+          {
+            "activity": "Submit Additional Documents",
+            "occurrences": 22,
+            "mean_hours": 64.1,
+            "median_hours": 59.9,
+            "max_hours": 105.8,
+            "min_hours": 30.0,
+            "total_hours": 1410.2,
+            "share_of_total_time_pct": 7.7,
+            "occurrences_over_threshold": 15
+          },
+          {
+            "activity": "Verify Employment Information",
+            "occurrences": 96,
+            "mean_hours": 57.6,
+            "median_hours": 54.0,
+            "max_hours": 142.8,
+            "min_hours": 28.6,
+            "total_hours": 5533.7,
+            "share_of_total_time_pct": 30.4,
+            "occurrences_over_threshold": 60
+          },
+          {
+            "activity": "Verify Housing Information",
+            "occurrences": 96,
+            "mean_hours": 52.9,
+            "median_hours": 50.5,
+            "max_hours": 92.0,
+            "min_hours": 26.3,
+            "total_hours": 5079.9,
+            "share_of_total_time_pct": 27.9,
+            "occurrences_over_threshold": 54
+          },
+          {
+            "activity": "Review Application",
+            "occurrences": 88,
+            "mean_hours": 27.2,
+            "median_hours": 25.8,
+            "max_hours": 45.6,
+            "min_hours": 13.7,
+            "total_hours": 2391.9,
+            "share_of_total_time_pct": 13.1,
+            "occurrences_over_threshold": 0
+          },
+          {
+            "activity": "Assess Eligibility",
+            "occurrences": 96,
+            "mean_hours": 13.2,
+            "median_hours": 13.0,
+            "max_hours": 23.0,
+            "min_hours": 5.9,
+            "total_hours": 1265.8,
+            "share_of_total_time_pct": 7.0,
+            "occurrences_over_threshold": 0
+          },
+          {
+            "activity": "Check Submitted Documents",
+            "occurrences": 122,
+            "mean_hours": 11.7,
+            "median_hours": 10.7,
+            "max_hours": 22.7,
+            "min_hours": 4.6,
+            "total_hours": 1426.2,
+            "share_of_total_time_pct": 7.8,
+            "occurrences_over_threshold": 0
+          },
+          {
+            "activity": "Reject Application",
+            "occurrences": 32,
+            "mean_hours": 6.0,
+            "median_hours": 6.2,
+            "max_hours": 10.3,
+            "min_hours": 2.6,
+            "total_hours": 192.2,
+            "share_of_total_time_pct": 1.1,
+            "occurrences_over_threshold": 0
+          },
+          {
+            "activity": "Approve Application",
+            "occurrences": 68,
+            "mean_hours": 5.3,
+            "median_hours": 5.3,
+            "max_hours": 9.1,
+            "min_hours": 2.2,
+            "total_hours": 362.4,
+            "share_of_total_time_pct": 2.0,
+            "occurrences_over_threshold": 0
+          },
+          {
+            "activity": "Combine Verification Results",
+            "occurrences": 96,
+            "mean_hours": 3.8,
+            "median_hours": 3.6,
+            "max_hours": 7.1,
+            "min_hours": 1.3,
+            "total_hours": 364.1,
+            "share_of_total_time_pct": 2.0,
+            "occurrences_over_threshold": 0
+          },
+          {
+            "activity": "Request Additional Documents",
+            "occurrences": 22,
+            "mean_hours": 2.7,
+            "median_hours": 2.8,
+            "max_hours": 4.3,
+            "min_hours": 1.3,
+            "total_hours": 59.6,
+            "share_of_total_time_pct": 0.3,
+            "occurrences_over_threshold": 0
+          },
+          {
+            "activity": "Submit Housing Subsidy Application",
+            "occurrences": 100,
+            "mean_hours": 0.8,
+            "median_hours": 0.7,
+            "max_hours": 1.4,
+            "min_hours": 0.2,
+            "total_hours": 75.2,
+            "share_of_total_time_pct": 0.4,
+            "occurrences_over_threshold": 0
+          },
+          {
+            "activity": "Notify Applicant",
+            "occurrences": 100,
+            "mean_hours": 0.5,
+            "median_hours": 0.4,
+            "max_hours": 0.9,
+            "min_hours": 0.1,
+            "total_hours": 46.9,
+            "share_of_total_time_pct": 0.3,
+            "occurrences_over_threshold": 0
+          }
+        ],
+        "top_bottleneck": "Submit Additional Documents",
+        "rework_cases": 22,
+        "rework_percentage": 22.0,
+        "parallel_synchronisation": {
+          "cases_with_parallel_branches": 96,
+          "idle_wait_hours": {
+            "mean": 20.0,
+            "median": 14.2,
+            "max": 93.0
+          },
+          "slower_branch_frequency": {
+            "Verify Housing Information": 44,
+            "Verify Employment Information": 52
+          }
+        }
+      },
+      "outcomes": {
+        "total_cases": 100,
+        "approved": 68,
+        "approved_pct": 68.0,
+        "rejected": 32,
+        "rejected_pct": 32.0,
+        "required_supplement": 22,
+        "required_supplement_pct": 22.0
+      },
+      "resources": [
+        {
+          "resource": "Housing Security Department",
+          "events": 620,
+          "activity_types": 8,
+          "mean_hours": 18.0,
+          "total_hours": 11142.1
+        },
+        {
+          "resource": "Human Resources Department",
+          "events": 96,
+          "activity_types": 1,
+          "mean_hours": 57.6,
+          "total_hours": 5533.7
+        },
+        {
+          "resource": "Citizen",
+          "events": 122,
+          "activity_types": 2,
+          "mean_hours": 12.2,
+          "total_hours": 1485.4
+        },
+        {
+          "resource": "CityStart Platform",
+          "events": 100,
+          "activity_types": 1,
+          "mean_hours": 0.5,
+          "total_hours": 46.9
+        }
+      ],
+      "conformance": {
+        "structural": {
+          "method": "designed-path comparison",
+          "designed_paths_enumerated": 13,
+          "conformant_cases": 100,
+          "conformant_percentage": 100.0,
+          "deviating_cases": 0,
+          "deviating_traces": []
+        },
+        "replay": {
+          "available": true,
+          "algorithm": "Inductive Miner + token-based replay",
+          "mean_trace_fitness": 1.0,
+          "perfectly_fitting_cases": 100,
+          "perfectly_fitting_percentage": 100.0,
+          "petri_net_places": 14,
+          "petri_net_transitions": 16,
+          "silent_transitions": 4,
+          "model_image": "output\\P2_inductive_miner.png"
+        }
+      }
+    }
+  },
+  "comparison": {
+    "throughput_ratio": 0.9,
+    "rows": [
+      {
+        "metric": "Cases",
+        "p1": 100,
+        "p2": 100
+      },
+      {
+        "metric": "Events",
+        "p1": 708,
+        "p2": 938
+      },
+      {
+        "metric": "Control-flow variants",
+        "p1": 5,
+        "p2": 9
+      },
+      {
+        "metric": "Mean throughput (days)",
+        "p1": 6.3,
+        "p2": 5.7
+      },
+      {
+        "metric": "Median throughput (days)",
+        "p1": 5.4,
+        "p2": 5.3
+      },
+      {
+        "metric": "Approval rate (%)",
+        "p1": 79.0,
+        "p2": 68.0
+      },
+      {
+        "metric": "Rejection rate (%)",
+        "p1": 21.0,
+        "p2": 32.0
+      },
+      {
+        "metric": "Supplement rate (%)",
+        "p1": 30.0,
+        "p2": 22.0
+      },
+      {
+        "metric": "Rework rate (%)",
+        "p1": 30.0,
+        "p2": 22.0
+      },
+      {
+        "metric": "Top bottleneck",
+        "p1": "Review Application",
+        "p2": "Submit Additional Documents"
+      },
+      {
+        "metric": "Structural conformance (%)",
+        "p1": 100.0,
+        "p2": 100.0
+      }
+    ]
+  }
+}

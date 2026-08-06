@@ -1,0 +1,6 @@
+﻿# Process mining (F). Baseline 1: Python 3.12.
+# pm4py is only needed for Petri net discovery and replay fitness; the
+# validation gate and the CSV/XES pipeline run without it.
+pm4py>=2.7,<3.0
+pandas>=2.0,<3.0
+graphviz>=0.20,<1.0

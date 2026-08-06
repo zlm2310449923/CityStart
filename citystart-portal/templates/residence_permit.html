@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block title %}Residence Permit Application - CityStart{% endblock %}
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-file-earmark-text me-2"></i>Residence Permit Application (S2)</h2>
+<div id="alert-area"></div>
+
+<div class="card">
+    <div class="card-header bg-primary text-white">Apply for Residence Permit</div>
+    <div class="card-body">
+        <form id="permit-form">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="citizen_id" class="form-label">Citizen ID</label>
+                    <input type="text" class="form-control" id="citizen_id" placeholder="C1001" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="full_name" class="form-label">Full Name</label>
+                    <input type="text" class="form-control" id="full_name" required>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="id_number" class="form-label">Identity Document Number</label>
+                <input type="text" class="form-control" id="id_number" required>
+            </div>
+            <div class="mb-3">
+                <label for="current_address" class="form-label">Current Address</label>
+                <input type="text" class="form-control" id="current_address" required>
+            </div>
+            <div class="mb-3">
+                <label for="residence_reason" class="form-label">Reason for Residence</label>
+                <select class="form-select" id="residence_reason">
+                    <option value="employment">Employment</option>
+                    <option value="education">Education</option>
+                    <option value="family">Family Reunion</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary" id="submit-btn">Submit Application</button>
+        </form>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header bg-light">Upload Supporting Documents</div>
+    <div class="card-body">
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" id="app-id" placeholder="Application ID">
+            <input type="text" class="form-control" id="doc-type" placeholder="Document Type (e.g. identity_document)">
+            <button class="btn btn-outline-success" id="upload-btn">Upload</button>
+        </div>
+        <div id="upload-result"></div>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header bg-light">Query Application Status</div>
+    <div class="card-body">
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" id="query-app-id" placeholder="Application ID">
+            <button class="btn btn-outline-primary" id="query-btn">Query</button>
+        </div>
+        <div id="query-result"></div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+document.getElementById('permit-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    setLoading('submit-btn', true);
+    const body = {
+        citizen_id: document.getElementById('citizen_id').value,
+        full_name: document.getElementById('full_name').value,
+        id_number: document.getElementById('id_number').value,
+        current_address: document.getElementById('current_address').value,
+        residence_reason: document.getElementById('residence_reason').value
+    };
+    const result = await apiPost('residence/residence-permit-applications', body);
+    setLoading('submit-btn', false);
+    if (result.ok) {
+        const app = result.data || {};
+        showAlert('alert-area',
+            `Application submitted. Application ID: <code>${escapeHtml(app.application_id || 'N/A')}</code> `
+            + `Status: ${statusBadge(app.status)}`, 'success');
+        if (app.application_id) {
+            document.getElementById('app-id').value = app.application_id;
+            document.getElementById('query-app-id').value = app.application_id;
+        }
+    } else {
+        showApiError('alert-area', result, 'Submission failed.');
+    }
+});
+
+document.getElementById('upload-btn').addEventListener('click', async function() {
+    const appId = document.getElementById('app-id').value.trim();
+    const docType = document.getElementById('doc-type').value.trim();
+    if (!appId || !docType) {
+        document.getElementById('upload-result').innerHTML =
+            '<p class="text-warning mb-0">Enter both an application ID and a document type.</p>';
+        return;
+    }
+    const result = await apiPost(
+        `residence/residence-permit-applications/${encodeURIComponent(appId)}/documents`,
+        { document_type: docType, file_name: `${docType}.pdf` });
+    const container = document.getElementById('upload-result');
+    if (result.ok) {
+        container.innerHTML = '<p class="text-success mb-0">Document record created.</p>';
+    } else {
+        container.innerHTML =
+            `<p class="text-danger mb-0">[${escapeHtml(result.error.code)}] ${escapeHtml(result.error.message)}</p>`;
+    }
+});
+
+document.getElementById('query-btn').addEventListener('click', async function() {
+    const appId = document.getElementById('query-app-id').value.trim();
+    if (!appId) return;
+    const result = await apiGet(`residence/residence-permit-applications/${encodeURIComponent(appId)}`);
+    if (result.ok) {
+        renderJson('query-result', result.data);
+    } else {
+        document.getElementById('query-result').innerHTML =
+            `<p class="text-danger mb-0">[${escapeHtml(result.error.code)}] ${escapeHtml(result.error.message)}</p>`;
+    }
+});
+</script>
+{% endblock %}

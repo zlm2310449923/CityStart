@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}Application Status Dashboard - CityStart{% endblock %}
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-speedometer2 me-2"></i>Application Status Dashboard</h2>
+<div id="alert-area"></div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label for="status-citizen-id" class="form-label">Citizen ID</label>
+                <input type="text" class="form-control" id="status-citizen-id" placeholder="C1001">
+            </div>
+            <div class="col-md-4">
+                <button class="btn btn-primary" id="load-status-btn">Load Status</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="dashboard-content">
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card text-center h-100">
+                <div class="card-header bg-primary text-white">Residence</div>
+                <div class="card-body" id="residence-status-card">
+                    <p class="text-muted small mb-0">Load a citizen to view status.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center h-100">
+                <div class="card-header bg-success text-white">Employment</div>
+                <div class="card-body" id="employment-status-card">
+                    <p class="text-muted small mb-0">Load a citizen to view status.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center h-100">
+                <div class="card-header bg-info text-white">Housing</div>
+                <div class="card-body" id="housing-status-card">
+                    <p class="text-muted small mb-0">Load a citizen to view status.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-header bg-light">Recommendation Status</div>
+        <div class="card-body" id="recommendation-status-card">
+            <p class="text-muted">Load a citizen to view recommendations.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+/* statusBadge() comes from main.js and implements the Baseline §4.5
+   status vocabulary. It is not redefined here. */
+
+document.getElementById('load-status-btn').addEventListener('click', async function() {
+    const citizenId = document.getElementById('status-citizen-id').value.trim();
+    if (!citizenId) {
+        showAlert('alert-area', 'Please enter a Citizen ID.', 'warning');
+        return;
+    }
+    setLoading('load-status-btn', true);
+    const result = await apiGet(`citizens/${encodeURIComponent(citizenId)}/service-plan`);
+    setLoading('load-status-btn', false);
+
+    if (!result.ok) {
+        showApiError('alert-area', result, 'Could not load service plan.');
+        return;
+    }
+
+    showAlert('alert-area', `Service plan loaded for <code>${escapeHtml(citizenId)}</code>.`, 'success');
+    const d = result.data || {};
+
+    document.getElementById('residence-status-card').innerHTML = `
+        <p class="mb-1 small text-muted">Registration</p>
+        ${statusBadge(d.residence_registration_status)}
+        <p class="mb-1 mt-3 small text-muted">Permit</p>
+        ${statusBadge(d.residence_permit_status)}`;
+
+    document.getElementById('employment-status-card').innerHTML = `
+        <p class="mb-1 small text-muted">Registration</p>
+        ${statusBadge(d.employment_registration_status)}
+        <p class="mb-1 mt-3 small text-muted">Support Application</p>
+        ${statusBadge(d.employment_support_status)}`;
+
+    document.getElementById('housing-status-card').innerHTML = `
+        <p class="mb-1 small text-muted">Subsidy Application</p>
+        ${statusBadge(d.housing_subsidy_status)}
+        <p class="mb-1 mt-3 small text-muted">Eligibility</p>
+        ${statusBadge(d.housing_eligibility_status)}`;
+
+    const rec = (d.recommended_services && d.recommended_services.length)
+        ? `<ul class="mb-0">${d.recommended_services.map(s => `<li>${escapeHtml(s)}</li>`).join('')}</ul>`
+        : '<p class="text-muted mb-0">No further services recommended.</p>';
+    const missing = (d.missing_requirements && d.missing_requirements.length)
+        ? `<h6 class="mt-3">Missing Requirements</h6>
+           <ul class="mb-0">${d.missing_requirements.map(s => `<li>${escapeHtml(s)}</li>`).join('')}</ul>`
+        : '';
+    document.getElementById('recommendation-status-card').innerHTML = `
+        <h6>Next Recommended Services</h6>${rec}${missing}`;
+});
+</script>
+{% endblock %}

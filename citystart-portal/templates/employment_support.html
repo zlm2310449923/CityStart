@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Employment Support Application - CityStart{% endblock %}
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-piggy-bank me-2"></i>Employment Support Application (S4)</h2>
+<div id="alert-area"></div>
+
+<div class="card">
+    <div class="card-header bg-primary text-white">Apply for Employment Support</div>
+    <div class="card-body">
+        <form id="support-form">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="citizen_id" class="form-label">Citizen ID</label>
+                    <input type="text" class="form-control" id="citizen_id" placeholder="C1001" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="full_name" class="form-label">Full Name</label>
+                    <input type="text" class="form-control" id="full_name" required>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="support_type" class="form-label">Support Type</label>
+                <select class="form-select" id="support_type">
+                    <option value="graduate_employment_subsidy">Graduate Employment Subsidy</option>
+                    <option value="job_training">Job Training Support</option>
+                    <option value="startup_support">Startup Support</option>
+                    <option value="social_insurance_subsidy">Social Insurance Subsidy</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <textarea class="form-control" id="description" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary" id="submit-btn">Submit Application</button>
+        </form>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header bg-light">Query Application</div>
+    <div class="card-body">
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" id="query-app-id" placeholder="Application ID">
+            <button class="btn btn-outline-primary" id="query-btn">Query</button>
+        </div>
+        <div id="query-result"></div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+document.getElementById('support-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    setLoading('submit-btn', true);
+    const body = {
+        citizen_id: document.getElementById('citizen_id').value,
+        full_name: document.getElementById('full_name').value,
+        support_type: document.getElementById('support_type').value,
+        description: document.getElementById('description').value
+    };
+    const result = await apiPost('employment/employment-support-applications', body);
+    setLoading('submit-btn', false);
+    if (result.ok) {
+        const app = result.data || {};
+        showAlert('alert-area',
+            `Application submitted. Application ID: <code>${escapeHtml(app.application_id || 'N/A')}</code> `
+            + `Status: ${statusBadge(app.status)}`, 'success');
+        if (app.application_id) {
+            document.getElementById('query-app-id').value = app.application_id;
+        }
+    } else {
+        showApiError('alert-area', result, 'Submission failed.');
+    }
+});
+
+document.getElementById('query-btn').addEventListener('click', async function() {
+    const appId = document.getElementById('query-app-id').value.trim();
+    if (!appId) return;
+    const result = await apiGet(`employment/employment-support-applications/${encodeURIComponent(appId)}`);
+    if (result.ok) {
+        renderJson('query-result', result.data);
+    } else {
+        document.getElementById('query-result').innerHTML =
+            `<p class="text-danger mb-0">[${escapeHtml(result.error.code)}] ${escapeHtml(result.error.message)}</p>`;
+    }
+});
+</script>
+{% endblock %}

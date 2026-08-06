@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Service Recommendations - CityStart{% endblock %}
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-lightbulb me-2"></i>Service Recommendations</h2>
+<div id="alert-area"></div>
+
+<div class="row">
+    <div class="col-md-5">
+        <div class="card">
+            <div class="card-header bg-primary text-white">Your Current Status</div>
+            <div class="card-body">
+                <form id="recommendation-form">
+                    <div class="mb-3">
+                        <label for="citizen_id" class="form-label">Citizen ID</label>
+                        <input type="text" class="form-control" id="citizen_id" placeholder="C1001" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Current Status</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="residence_registered">
+                            <label class="form-check-label" for="residence_registered">Residence Registered</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="residence_permit_approved">
+                            <label class="form-check-label" for="residence_permit_approved">Residence Permit Approved</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="employment_registered">
+                            <label class="form-check-label" for="employment_registered">Employment Registered</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="currently_renting">
+                            <label class="form-check-label" for="currently_renting">Currently Renting</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="owns_local_property">
+                            <label class="form-check-label" for="owns_local_property">Owns Local Property</label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="submit-btn">Get Recommendations</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-7">
+        <div class="card">
+            <div class="card-header bg-success text-white">Recommendation Results</div>
+            <div class="card-body" id="recommendation-result">
+                <p class="text-muted">Fill in your status and click "Get Recommendations" to see explainable service recommendations.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+document.getElementById('recommendation-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    setLoading('submit-btn', true);
+    const body = {
+        citizen_id: document.getElementById('citizen_id').value,
+        residence_registered: document.getElementById('residence_registered').checked,
+        residence_permit_approved: document.getElementById('residence_permit_approved').checked,
+        employment_registered: document.getElementById('employment_registered').checked,
+        currently_renting: document.getElementById('currently_renting').checked,
+        owns_local_property: document.getElementById('owns_local_property').checked,
+        available_documents: ['identity_document']
+    };
+    const result = await apiPost('recommendations', body);
+    setLoading('submit-btn', false);
+    const container = document.getElementById('recommendation-result');
+    if (result.ok) {
+        const d = result.data || {};
+        const list = (arr, empty) => (arr && arr.length)
+            ? `<ul>${arr.map(s => `<li>${escapeHtml(s)}</li>`).join('')}</ul>`
+            : `<p class="text-muted small">${empty}</p>`;
+        const ordered = (arr) => (arr && arr.length)
+            ? `<ol>${arr.map(s => `<li>${escapeHtml(s)}</li>`).join('')}</ol>`
+            : '<p class="text-muted small">No ordering required.</p>';
+        container.innerHTML = `
+            <h6 class="text-success">Completed Services</h6>
+            ${list(d.completed_services, 'No services completed yet.')}
+            <h6 class="text-primary">Recommended Services</h6>
+            ${list(d.recommended_services, 'No further services recommended.')}
+            <h6>Recommended Execution Order</h6>
+            ${ordered(d.recommended_order)}
+            <h6 class="text-warning">Missing Requirements</h6>
+            ${list(d.missing_requirements, 'Nothing missing.')}
+            <div class="alert alert-info mt-3 mb-0">
+                <strong>Why:</strong> ${escapeHtml(d.recommendation_reason || 'No explanation provided.')}
+            </div>`;
+    } else {
+        container.innerHTML =
+            `<p class="text-danger mb-0"><strong>Could not load recommendations.</strong><br>`
+            + `[${escapeHtml(result.error.code)}] ${escapeHtml(result.error.message)}</p>`;
+    }
+});
+</script>
+{% endblock %}
