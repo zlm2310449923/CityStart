@@ -1,11 +1,9 @@
-from fastapi.testclient import TestClient
-
-from app.main import app
-
-
-def test_health(tmp_path, monkeypatch):
-    monkeypatch.setenv("DATABASE_PATH", str(tmp_path / "residence.db"))
-    with TestClient(app) as client:
-        response = client.get("/health")
+def test_health(api):
+    response = api.get("/health")
     assert response.status_code == 200
-    assert response.json()["status"] == "ok"
+    assert response.json() == {
+        "service": "residence-service",
+        "status": "ok",
+        "version": "1.0.0",
+    }
+
