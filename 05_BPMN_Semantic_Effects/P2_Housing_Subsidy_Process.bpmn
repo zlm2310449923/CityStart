@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" id="Definitions_P2" targetNamespace="http://citystart.example/bpmn">
+  <bpmn:process id="P2_Housing_Subsidy_Process" name="P2 Housing Rental Subsidy Application and Eligibility Verification" isExecutable="false">
+    <bpmn:startEvent id="P2-Start" name="Start" />
+    <bpmn:userTask id="P2-T1" name="Submit Housing Subsidy Application" />
+    <bpmn:serviceTask id="P2-T2" name="Check Submitted Documents" />
+    <bpmn:exclusiveGateway id="P2-G1" name="Documents Complete?" />
+    <bpmn:serviceTask id="P2-T3" name="Request Additional Documents" />
+    <bpmn:intermediateCatchEvent id="P2-E1" name="Wait for Supplementary Documents" />
+    <bpmn:userTask id="P2-T4" name="Submit Additional Documents" />
+    <bpmn:parallelGateway id="P2-G2" name="Start Parallel Verification" />
+    <bpmn:serviceTask id="P2-T5" name="Verify Employment Information" />
+    <bpmn:serviceTask id="P2-T6" name="Verify Housing Information" />
+    <bpmn:parallelGateway id="P2-G3" name="Combine Verification Results" />
+    <bpmn:serviceTask id="P2-T7" name="Assess Eligibility" />
+    <bpmn:exclusiveGateway id="P2-G4" name="Eligible?" />
+    <bpmn:userTask id="P2-T8" name="Review Application" />
+    <bpmn:serviceTask id="P2-T9" name="Approve Application" />
+    <bpmn:serviceTask id="P2-T10" name="Reject Application" />
+    <bpmn:serviceTask id="P2-T11" name="Notify Applicant" />
+    <bpmn:endEvent id="P2-End" name="End" />
+    <bpmn:sequenceFlow id="F1" sourceRef="P2-Start" targetRef="P2-T1" />
+    <bpmn:sequenceFlow id="F2" sourceRef="P2-T1" targetRef="P2-T2" />
+    <bpmn:sequenceFlow id="F3" sourceRef="P2-T2" targetRef="P2-G1" />
+    <bpmn:sequenceFlow id="F4" name="Incomplete" sourceRef="P2-G1" targetRef="P2-T3" />
+    <bpmn:sequenceFlow id="F5" sourceRef="P2-T3" targetRef="P2-E1" />
+    <bpmn:sequenceFlow id="F6" sourceRef="P2-E1" targetRef="P2-T4" />
+    <bpmn:sequenceFlow id="F7" sourceRef="P2-T4" targetRef="P2-T2" />
+    <bpmn:sequenceFlow id="F8" name="Complete" sourceRef="P2-G1" targetRef="P2-G2" />
+    <bpmn:sequenceFlow id="F9" sourceRef="P2-G2" targetRef="P2-T5" />
+    <bpmn:sequenceFlow id="F10" sourceRef="P2-G2" targetRef="P2-T6" />
+    <bpmn:sequenceFlow id="F11" sourceRef="P2-T5" targetRef="P2-G3" />
+    <bpmn:sequenceFlow id="F12" sourceRef="P2-T6" targetRef="P2-G3" />
+    <bpmn:sequenceFlow id="F13" sourceRef="P2-G3" targetRef="P2-T7" />
+    <bpmn:sequenceFlow id="F14" sourceRef="P2-T7" targetRef="P2-G4" />
+    <bpmn:sequenceFlow id="F15" name="Eligible" sourceRef="P2-G4" targetRef="P2-T8" />
+    <bpmn:sequenceFlow id="F16" sourceRef="P2-T8" targetRef="P2-T9" />
+    <bpmn:sequenceFlow id="F17" name="Not eligible" sourceRef="P2-G4" targetRef="P2-T10" />
+    <bpmn:sequenceFlow id="F18" sourceRef="P2-T9" targetRef="P2-T11" />
+    <bpmn:sequenceFlow id="F19" sourceRef="P2-T10" targetRef="P2-T11" />
+    <bpmn:sequenceFlow id="F20" sourceRef="P2-T11" targetRef="P2-End" />
+  </bpmn:process>
+</bpmn:definitions>

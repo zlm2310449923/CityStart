@@ -1,0 +1,11 @@
+Layer,Element Type,Element,Description
+Business,Business Actor,Citizen,New urban resident using CityStart
+Business,Business Actor,Housing Security Department,Provides housing-related services
+Business,Business Service,S6 Housing Rental Subsidy Application Service,Processes rental subsidy applications
+Business,Business Process,P2 Housing Rental Subsidy Application and Eligibility Verification,Subsidy application and qualification verification process
+Application,Application Component,Housing Application Service,Microservice for housing subsidy application and eligibility checking
+Application,Application Interface,Housing Service API,Endpoints exposed by Housing Service
+Application,Data Object,housing.db,SQLite database used by Housing Service
+Technology,Node,Application Server,Runs FastAPI microservices
+Technology,System Software,Python Runtime / Uvicorn,Backend runtime
+Technology,Artifact,housing-service container/process,Deployable Housing Service artifact
